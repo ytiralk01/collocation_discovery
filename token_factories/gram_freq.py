@@ -9,7 +9,7 @@ import simplejson
 from collocation_discovery.text_cleaner.text_cleaner import TextCleaner
 
 
-class GramFreq(object):
+class GramFreq:
     def __init__(self, n):
         """
         tracks the frequency distribution
