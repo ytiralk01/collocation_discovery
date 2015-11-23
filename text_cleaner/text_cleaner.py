@@ -1,7 +1,5 @@
 __author__ = 'kafuinutakor'
 
-# coding=utf-8
-
 import unicodedata
 
 
@@ -26,7 +24,7 @@ class TextCleaner:
 
     def clean(self, document):
         """
-        removing excess white space, flattens char encoding, and normalizes all text to lower case
+        main cleaning method; removes excess white space, flattens char encoding, and normalizes all text to lower case
         """
         document = ' '.join([i.lower() for i in document.split()])
         return self.flatten_char(document)  # return flattened char text

@@ -1,8 +1,5 @@
 __author__ = 'kafuinutakor'
 
-#
-import sys
-sys.path.append('/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python')
 from scipy import stats
 import numpy as np
 from math import pow
@@ -13,25 +10,26 @@ class CollocationDiscovery:
     def __init__(self):
         self.combined_freq = {}
 
-    # dict merging method
     def dict_merger(self, freq1, freq2):
         """
-        this method merges dicts to use as a
-        reference in the computation below
+        this method merges dicts to use as a reference in the computation below
         """
         self.combined_freq = freq1.copy()
         self.combined_freq.update(freq2)
-        return None
 
-    # cumualtive distribution function wrapper
     def cum_dist_func(self, chiSquare):
+        """
+        wrapper for cumulative distribution function
+        """
         # use 1 degree of freedom given df = (R-1) * (C-1); df  == (2-1) * (2-1) == 1
         cs = 1.0 - float(stats.chi2.cdf(chiSquare, 1))
         #print stats.chi2.cdf(chiSquare, len(self.combined_freq) - 1)
         return cs
 
-    # chi square test
     def chi_square(self, collocation, freq):
+        """
+        computes 2 X 2 table and chi square statistic
+        """
         freq = self.combined_freq
         terms = collocation.split()
         # compute 2 X 2 table here
@@ -46,15 +44,11 @@ class CollocationDiscovery:
         # compute chi square statistic
         chi_square = (float(len(freq)) * pow(((array[0, 0] * array[1, 1]) - (array[0, 1] * array[1, 0])), 2)) /\
                     ((array[0, 0] + array[0, 1]) * (array[0, 0] + array[1, 0]) * (array[0, 1] + array[1, 1]) * (array[1, 0] + array[1, 1]))
-        #print array
         return chi_square
 
-    # evaluator
-    def evaluator(self, collocation):
+    def evaluate(self, collocation):
         """
-        call this method for the actual evaluation of the of each collocation
-        :param collocation:
-        :return:
+        runs chi square test on given collocation
         """
         cs = self.chi_square(collocation, self.combined_freq)
         p_value = self.cum_dist_func(cs)
