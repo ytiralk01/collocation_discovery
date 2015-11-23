@@ -9,7 +9,7 @@ from math import pow
 
 
 # collocation discoverer
-class CollocationDiscovery(object):
+class CollocationDiscovery:
     def __init__(self):
         self.combined_freq = {}
 

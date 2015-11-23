@@ -8,7 +8,7 @@ import simplejson
 from collocation_discovery.text_cleaner.text_cleaner import TextCleaner
 
 
-class TermFreq(object):
+class TermFreq:
     def __init__(self):
         """
         tracks the frequency distribution
