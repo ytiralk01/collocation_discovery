@@ -1,61 +1,56 @@
 __author__ = 'kafuinutakor'
 
-from scipy import stats
-import numpy as np
 from math import pow
+import numpy as np
+from scipy import stats
 
 
-# collocation discoverer
 class CollocationDiscovery:
+    """provides the functionality for collocation extraction; currently only supports chi square based strategy
+    """
     def __init__(self):
         self.combined_freq = {}
 
-    def dict_merger(self, freq1, freq2):
-        """
-        this method merges dicts to use as a reference in the computation below
-        """
+    def merge_dicts(self, freq1, freq2):
         self.combined_freq = freq1.copy()
         self.combined_freq.update(freq2)
 
-    def cum_dist_func(self, chiSquare):
-        """
-        wrapper for cumulative distribution function
+    def cum_dist_func(self, chi_square_stat):
+        """wrapper for cumulative distribution function; returns p-value
         """
         # use 1 degree of freedom given df = (R-1) * (C-1); df  == (2-1) * (2-1) == 1
-        cs = 1.0 - float(stats.chi2.cdf(chiSquare, 1))
-        #print stats.chi2.cdf(chiSquare, len(self.combined_freq) - 1)
-        return cs
+        p_value = 1.0 - float(stats.chi2.cdf(chi_square_stat, 1))
+        return p_value
 
-    def chi_square(self, collocation, freq):
+    def chi_square(self, collocation):
+        """computes 2 X 2 table and returns chi square statistic
         """
-        computes 2 X 2 table and chi square statistic
-        """
-        freq = self.combined_freq
         terms = collocation.split()
+
         # compute 2 X 2 table here
         array = [[], []]
-        array[0] = [float(freq[collocation]), float(freq[terms[1]] - freq[collocation])]
-        # in element 2's computation adjust for collaction frequency with a  factor of 2; simply add 8 to each before s
-        # before subtracting from n
-        array[1] = [float(freq[terms[0]]) - float(freq[collocation]),
-                    float(len(freq) - ((2.0 * float(freq[collocation])) + float(freq[terms[0]]) + float(freq[terms[1]])))]
-        # numpy nd array cast
+        array[0] = [float(self.combined_freq[collocation]), float(self.combined_freq[terms[1]] - self.combined_freq[collocation])]
+        array[1] = [float(self.combined_freq[terms[0]]) - float(self.combined_freq[collocation]),
+                    float(len(self.combined_freq) - ((2.0 * float(self.combined_freq[collocation])) +
+                                                     float(self.combined_freq[terms[0]]) + float(self.combined_freq[terms[1]])))]
+
+        # convert to nd array
         array = np.array(array)
+
         # compute chi square statistic
-        chi_square = (float(len(freq)) * pow(((array[0, 0] * array[1, 1]) - (array[0, 1] * array[1, 0])), 2)) /\
-                    ((array[0, 0] + array[0, 1]) * (array[0, 0] + array[1, 0]) * (array[0, 1] + array[1, 1]) * (array[1, 0] + array[1, 1]))
+        chi_square = (float(len(self.combined_freq)) * pow(((array[0, 0] * array[1, 1]) - (array[0, 1] * array[1, 0])), 2)) /\
+                    ((array[0, 0] + array[0, 1]) * (array[0, 0] + array[1, 0]) * (array[0, 1] + array[1, 1]) *
+                     (array[1, 0] + array[1, 1]))
         return chi_square
 
-    def evaluate(self, collocation):
+    def evaluate(self, collocation, p_value_thresh=.1):
+        """runs chi square test on given collocation
         """
-        runs chi square test on given collocation
-        """
-        cs = self.chi_square(collocation, self.combined_freq)
+        cs = self.chi_square(collocation)
         p_value = self.cum_dist_func(cs)
-        #change this either to a parameter for the method or remove all together
-        if p_value <= .1:
+
+        if p_value <= p_value_thresh:
             return str(cs), str(p_value), str(self.combined_freq[collocation])
-        else:
-            return None
+
 
 

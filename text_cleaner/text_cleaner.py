@@ -1,30 +1,27 @@
-__author__ = 'kafuinutakor'
+__author__ = "kafuinutakor"
 
 import unicodedata
 
 
 class TextCleaner:
+    """handles and cleans text to avoid character encoding errors
+    """
     def __init__(self):
         pass
 
-    def flatten_char(self, text):
+    def normalize_text(self, text):
         if not text:
-            return ''
+            return ""
         if isinstance(text, unicode):
             # if the input is unicode, then normalize to flatten characters
-            flat_text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
+            return unicodedata.normalize("NFD", text).encode("ascii", "ignore")
         elif isinstance(text, str):
-            # if it's a string, cast as unicode prior to flattening
-            text = unicode(text, 'utf-8', 'ignore')
-            # flatten characters
-            flat_text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore')
-        else:
-            flat_text = text
-        return flat_text
+            # if it"s a string, cast as unicode prior to flattening
+            text = unicode(text, "utf-8", "ignore")
+            return unicodedata.normalize("NFD", text).encode("ascii", "ignore")
 
-    def clean(self, document):
+    def clean(self, text):
+        """main cleaning method; clean spaces, lower case and normalize chars
         """
-        main cleaning method; removes excess white space, flattens char encoding, and normalizes all text to lower case
-        """
-        document = ' '.join([i.lower() for i in document.split()])
-        return self.flatten_char(document)  # return flattened char text
+        text = " ".join([i.lower() for i in text.split()])
+        return self.normalize_text(text)
